@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.literature.mapper.EmpMapper">
+  <resultMap id="BaseResultMap" type="com.literature.po.Emp">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="dept_id" jdbcType="BIGINT" property="deptId" />
+  </resultMap>
+  
+  <!-- customer -->
+  <resultMap id="BaseResultMapWithDept" type="com.literature.po.Emp">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="dept_id" jdbcType="BIGINT" property="deptId" />
+    <association property="dept" javaType="com.literature.po.Dept">
+    	<id column="did" property="id" jdbcType="BIGINT"/>
+    	<result column="dname" property="name" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List_With_Dept">
+    emp.id, emp.name, emp.dept_id,dept.id did,dept.name dname
+  </sql>
+   <select id="selectByDeptIdWithDept" parameterType="long" resultMap="BaseResultMapWithDept">
+    select
+    <include refid="Base_Column_List_With_Dept" />
+    from emp left join dept on emp.dept_id=dept.id
+    <if test="deptId != null">
+      where emp.dept_id=#{deptId}
+    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithDept" parameterType="long" resultMap="BaseResultMapWithDept">
+    select 
+    <include refid="Base_Column_List_With_Dept" />
+    from emp left join dept on emp.dept_id=dept.id
+    <if test="id != null">
+    where emp.id = #{id}
+    </if>
+  </select>
+</mapper>

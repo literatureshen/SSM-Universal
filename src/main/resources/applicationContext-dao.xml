@@ -1,0 +1,55 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd"
+	default-lazy-init="true">
+
+	<description>Spring DAO</description>
+		
+	<!-- 读取配置文件 -->
+	<context:property-placeholder ignore-unresolvable="true" location="classpath*:/application.properties" />
+		
+	<!-- 数据源配置, 使用druid连接池 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<!-- 申请连接的时候检测 -->
+		<property name="testWhileIdle" value="true"></property>
+		<!-- 检测连接 -->
+		<property name="validationQuery" value="SELECT 1"></property>
+		<!--maxActive: 最大连接数量 -->
+		<property name="maxActive" value="${jdbc.pool.maxActive}" />
+		<!--initialSize: 初始化连接 -->
+		<property name="initialSize" value="${jdbc.pool.maxIdle}" />
+	</bean>
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 加载mybatis的配置文件 -->
+        <property name="configLocation" value="classpath:SqlMapConfig.xml" />
+        <!-- 数据源 -->
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+ 
+    <!-- mapper批量扫描，从mapper包中扫描出mapper接口，自动的创建代理对象并且在spring容器中注册
+	        遵循规范：将mapper.java和mapper.xml映射文件名称保持一致，且在同一个目录下
+	        自动扫描出来的mapper的bean的id为mapper类名(首字母小写)
+     -->
+     <!-- 使用通用Mapper -->
+    <bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.literature.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+</beans>

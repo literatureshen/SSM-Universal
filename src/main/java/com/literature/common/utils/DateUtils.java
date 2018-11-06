@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 
@@ -199,6 +201,51 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 	}
 	
 	/**
+	 * 将特定格式的日期字符串转为日期对象
+	 * 		str="18-Nov-02 0744"
+	 * 		SimpleDateFormat sdf = new SimpleDateFormat("yy-MMM-dd HHmm", Locale.US);
+	 * 		sdf.parse(str);
+	 * @param dateStr
+	 * @param pattern
+	 * @param locale
+	 * @return 
+	 */
+	public static Date parseDate(String dateStr,String pattern,Locale locale) {
+		if(dateStr!=null&&!"".equals(dateStr)) {
+			if(pattern==null||"".equals(pattern)) {
+				pattern=parsePatterns[1];
+			}
+			if(locale==null) {
+				try {
+					return new SimpleDateFormat(pattern).parse(dateStr);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}else{
+				try {
+					return new SimpleDateFormat(pattern,locale).parse(dateStr);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 获得指定日期前n天的日期
+	 * @param dateStr
+	 * @param n
+	 * @return
+	 */
+	public static Date getLastNDay(String dateStr,int n) {
+		Date date=parseDate(dateStr, "", null);
+		return new Date(date.getTime()-n*24*60*60*1000);
+	}
+	
+	/**
 	 * @param args
 	 * @throws ParseException
 	 */
@@ -207,5 +254,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 //		System.out.println(getDate("yyyy年MM月dd日 E"));
 //		long time = new Date().getTime()-parseDate("2012-11-19").getTime();
 //		System.out.println(time/(24*60*60*1000));
+		String now=formatDateTime(new Date());
+		int n=1;
+		String last=formatDateTime(getLastNDay(now,n));
+		System.out.println(now);
+		System.out.println(last);
 	}
 }
